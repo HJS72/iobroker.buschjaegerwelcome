@@ -21,6 +21,7 @@ export class WelcomeClient {
     private client: AxiosInstance;
     private sessionId: string | null = null;
     private config: ApiConfig;
+    private logger: ((msg: string) => void) | null = null;
 
     constructor(
         private gatewayIp: string,
@@ -48,40 +49,94 @@ export class WelcomeClient {
     }
 
     /**
+     * Set logger function for debug output
+     */
+    setLogger(logger: (msg: string) => void): void {
+        this.logger = logger;
+    }
+
+    private log(msg: string): void {
+        if (this.logger) {
+            this.logger(msg);
+        }
+    }
+
+    /**
      * Authenticate with the gateway and store session ID.
      * @returns true if authentication successful
      */
     async login(): Promise<boolean> {
         try {
-            // TODO: Adapt payload and response handling to actual gateway API.
-            // Typical patterns: form-data with username/password or JSON body.
+            this.log(`Attempting login to ${this.gatewayIp}:${this.gatewayPort}...`);
+
+            // Try login with JSON body
             const response = await this.client.post(this.config.loginEndpoint, {
                 username: this.username,
                 password: this.password,
             });
 
-            // TODO: Extract session ID from response headers or body.
-            // Common patterns: response.headers["set-cookie"], response.data.sessionId, etc.
+            this.log(`Login response status: ${response.status}`);
+            this.log(`Response headers: ${JSON.stringify(response.headers, null, 2)}`);
+            this.log(`Response data: ${JSON.stringify(response.data)}`);
+
+            // Try multiple session extraction methods
+            // Method 1: Extract from Set-Cookie header
             const setCookie = response.headers["set-cookie"];
             if (setCookie) {
-                const sessionMatch = setCookie[0]?.match(/SESSIONID=([^;]+)/);
+                const cookieStr = Array.isArray(setCookie) ? setCookie[0] : setCookie;
+                this.log(`Found Set-Cookie: ${cookieStr}`);
+                
+                // Try SESSIONID
+                let sessionMatch = cookieStr.match(/SESSIONID=([^;]+)/i);
                 if (sessionMatch) {
                     this.sessionId = sessionMatch[1];
-                    // Add session cookie to all future requests
+                    this.log(`Extracted sessionId (SESSIONID): ${this.sessionId}`);
                     this.client.defaults.headers.common["Cookie"] = `SESSIONID=${this.sessionId}`;
+                    return true;
+                }
+
+                // Try other common session cookie names
+                sessionMatch = cookieStr.match(/(SID|SESSION|JSESSIONID|PHPSESSID)=([^;]+)/i);
+                if (sessionMatch) {
+                    this.sessionId = sessionMatch[2];
+                    this.log(`Extracted sessionId (${sessionMatch[1]}): ${this.sessionId}`);
+                    this.client.defaults.headers.common["Cookie"] = `${sessionMatch[1]}=${this.sessionId}`;
                     return true;
                 }
             }
 
-            // Alternative: check if response.data contains session info
+            // Method 2: Check response body for session info
             if (response.data?.sessionId) {
                 this.sessionId = response.data.sessionId;
+                this.log(`Found sessionId in response.data: ${this.sessionId}`);
                 this.client.defaults.headers.common["Authorization"] = `Bearer ${this.sessionId}`;
                 return true;
             }
 
+            // Method 3: Check for auth token
+            if (response.data?.token) {
+                this.sessionId = response.data.token;
+                this.log(`Found token in response.data: ${this.sessionId}`);
+                this.client.defaults.headers.common["Authorization"] = `Bearer ${this.sessionId}`;
+                return true;
+            }
+
+            // Method 4: Success on 200/201 with any response (implicit auth)
+            if (response.status === 200 || response.status === 201) {
+                this.log("Login succeeded (implicit auth based on 200 response)");
+                // Store response data as fallback
+                this.sessionId = "authenticated";
+                return true;
+            }
+
+            this.log("No session identifier found in response");
             return false;
         } catch (error) {
+            this.log(`Login failed: ${error instanceof Error ? error.message : String(error)}`);
+            if (axios.isAxiosError(error)) {
+                this.log(`Response status: ${error.response?.status}`);
+                this.log(`Response data: ${JSON.stringify(error.response?.data)}`);
+            }
             return false;
         }
     }

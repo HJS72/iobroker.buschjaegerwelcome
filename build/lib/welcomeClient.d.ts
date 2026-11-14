@@ -10,7 +10,13 @@ export declare class WelcomeClient {
     private client;
     private sessionId;
     private config;
+    private logger;
     constructor(gatewayIp: string, gatewayPort: number, username: string, password: string);
+    /**
+     * Set logger function for debug output
+     */
+    setLogger(logger: (msg: string) => void): void;
+    private log;
     /**
      * Authenticate with the gateway and store session ID.
      * @returns true if authentication successful

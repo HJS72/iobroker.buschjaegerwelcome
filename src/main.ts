@@ -51,13 +51,14 @@ class BuschJaegerWelcomeAdapter extends utils.Adapter {
             const sipPort = this.config.sipPort || 5060;
             const pollInterval = this.config.pollInterval || 30;
 
-            // Create client
+            // Create client with logger
             this.welcomeClient = new WelcomeClient(
                 gatewayIp,
                 gatewayPort,
                 username,
                 password,
             );
+            this.welcomeClient.setLogger((msg) => this.log.debug(msg));
 
             // Create SIP listener
             this.sipListener = new SipListener(sipPort, "0.0.0.0");
