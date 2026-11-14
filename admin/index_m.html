@@ -25,19 +25,70 @@
 
             .input-field > label {
                 font-size: 0.8rem;
+                color: rgba(0, 0, 0, 0.7);
             }
 
+            /* DEFAULT LIGHT MODE */
             input[type="text"],
             input[type="password"],
             input[type="number"] {
+                color: #000 !important;
+                background-color: #fff !important;
                 border-bottom: 1px solid rgba(0, 0, 0, 0.12) !important;
             }
 
-            /* Dark mode support */
+            input[type="text"]::placeholder,
+            input[type="password"]::placeholder,
+            input[type="number"]::placeholder {
+                color: rgba(0, 0, 0, 0.4) !important;
+            }
+
+            .help-text {
+                display: block;
+                font-size: 0.75rem;
+                color: #666;
+                margin-top: 5px;
+                font-weight: 400;
+            }
+
+            .title {
+                margin: 0 0 1.5rem 0;
+                font-size: 1.5rem;
+                font-weight: 500;
+                color: #000;
+            }
+
+            .tabs {
+                background-color: #fff;
+            }
+
+            .tabs .tab a {
+                color: rgba(0, 0, 0, 0.7);
+            }
+
+            .tabs .tab a.active {
+                color: #2196f3;
+            }
+
+            .tabs .indicator {
+                background-color: #2196f3;
+            }
+
+            /* DARK MODE */
+            body.dark {
+                background-color: #303030;
+                color: #fff;
+            }
+
+            body.dark .adapter-settings {
+                background-color: #303030;
+            }
+
             body.dark input[type="text"],
             body.dark input[type="password"],
             body.dark input[type="number"] {
                 color: #fff !important;
+                background-color: #555 !important;
                 border-bottom-color: rgba(255, 255, 255, 0.12) !important;
             }
 
@@ -55,54 +106,24 @@
                 color: #2196f3 !important;
             }
 
-            .help-text {
-                display: block;
-                font-size: 0.75rem;
-                color: #666;
-                margin-top: 5px;
-                font-weight: 400;
-            }
-
             body.dark .help-text {
                 color: rgba(255, 255, 255, 0.6);
-            }
-
-            .title {
-                margin: 0 0 1.5rem 0;
-                font-size: 1.5rem;
-                font-weight: 500;
             }
 
             body.dark .title {
                 color: #fff;
             }
 
-            .tabs {
-                background-color: #fff;
-            }
-
             body.dark .tabs {
                 background-color: #424242;
-            }
-
-            .tabs .tab a {
-                color: rgba(0, 0, 0, 0.7);
             }
 
             body.dark .tabs .tab a {
                 color: rgba(255, 255, 255, 0.7);
             }
 
-            .tabs .tab a.active {
-                color: #2196f3;
-            }
-
             body.dark .tabs .tab a.active {
                 color: #2196f3;
-            }
-
-            .tabs .indicator {
-                background-color: #2196f3;
             }
 
             /* Button styles */
@@ -129,14 +150,12 @@
                 margin-top: 2rem;
                 display: flex;
                 gap: 1rem;
+                padding: 20px;
+                background-color: #f5f5f5;
+                border-radius: 4px;
             }
 
-            body.dark {
-                background-color: #303030;
-                color: #fff;
-            }
-
-            body.dark .adapter-settings {
+            body.dark .button-row {
                 background-color: #424242;
             }
         </style>
@@ -242,17 +261,15 @@
         <script>
             // Save button click
             document.getElementById("saveButton").addEventListener("click", function () {
-                // Call standard ioBroker save function
                 if (typeof save === "function") {
                     save(function (settings) {
-                        // Settings saved by adapter-settings.js
+                        console.log("Settings saved", settings);
                     });
                 }
             });
 
             // Cancel button click
             document.getElementById("cancelButton").addEventListener("click", function () {
-                // Reload from server
                 if (typeof load === "function") {
                     load(window.settings, onChange);
                 }
