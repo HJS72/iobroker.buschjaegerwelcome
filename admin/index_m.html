@@ -96,8 +96,12 @@
     <script src="../../lib/js/socket.io.js"></script>
     <script src="../../js/adapter-settings.js"></script>
     <script>
+        let settingsChanged = false;
+
         // Global load function - called by ioBroker framework
         function load(settings, onDone) {
+            console.log('load() called with settings:', settings);
+            
             $('#gatewayIp').val(settings.gatewayIp || '');
             $('#gatewayPort').val(settings.gatewayPort || 80);
             $('#username').val(settings.username || '');
@@ -112,9 +116,13 @@
             }
             
             // Track changes
-            $('.value').on('change input', function () {
+            $('.value').off('change input').on('change input', function () {
+                console.log('Field changed:', $(this).attr('id'), $(this).val());
+                settingsChanged = true;
                 onChange();
             });
+            
+            settingsChanged = false;
             
             if (onDone && typeof onDone === 'function') {
                 onDone();
@@ -123,11 +131,14 @@
 
         // Change handler - triggers button display
         function onChange() {
-            // No-op but required for framework to show save button
+            console.log('onChange() called, settingsChanged =', settingsChanged);
+            // Called by framework to detect changes
         }
 
         // Global save function - called by ioBroker framework
         function save(callback) {
+            console.log('save() called');
+            
             const newSettings = {
                 gatewayIp: $('#gatewayIp').val() || '',
                 gatewayPort: parseInt($('#gatewayPort').val()) || 80,
@@ -138,14 +149,27 @@
                 doorOpenDuration: parseInt($('#doorOpenDuration').val()) || 5
             };
             
+            console.log('Sending settings:', newSettings);
+            console.log('sendTo function exists?', typeof sendTo);
+            
             if (typeof sendTo === 'function') {
-                sendTo(null, 'save', newSettings, callback);
-            } else if (callback) {
-                callback();
+                sendTo(null, 'save', newSettings, function (result) {
+                    console.log('sendTo callback:', result);
+                    settingsChanged = false;
+                    if (callback && typeof callback === 'function') {
+                        callback();
+                    }
+                });
+            } else {
+                console.warn('sendTo function not available');
+                if (callback && typeof callback === 'function') {
+                    callback();
+                }
             }
         }
 
         $(document).ready(function () {
+            console.log('Page ready. M =', typeof M);
             if (typeof M !== 'undefined') {
                 M.updateTextFields();
             }

@@ -48,9 +48,7 @@
     "pollInterval": 30,
     "doorOpenDuration": 5
   },
-  "encryptedNative": [
-    "password"
-  ],
+  "encryptedNative": [],
   "admin": {
     "tab_options": {
       "order": 1
