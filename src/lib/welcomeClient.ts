@@ -3,14 +3,11 @@ import https from "https";
 
 /**
  * Interface for API configuration endpoints and payloads.
- * Adjust these values based on actual Busch-Welcome firmware responses
- * (obtain via Wireshark capture or browser DevTools during login/control).
+ * Door and camera endpoints remain placeholders.
  */
 interface ApiConfig {
-    loginEndpoint: string;
     doorbellOpenEndpoint: string;
     snapshotEndpoint: string;
-    healthCheckEndpoint: string;
 }
 
 /**
@@ -29,13 +26,9 @@ export class WelcomeClient {
         private username: string,
         private password: string,
     ) {
-        // TODO: Verify exact endpoints by Wireshark capture or gateway documentation.
-        // These are educated guesses based on typical IP-camera/gateway patterns.
         this.config = {
-            loginEndpoint: "/admin/login",
             doorbellOpenEndpoint: "/command/unlock",
             snapshotEndpoint: "/video/snapshot.jpg",
-            healthCheckEndpoint: "/admin/status",
         };
 
         // Create axios instance with SSL bypass for self-signed certificates
@@ -66,78 +59,43 @@ export class WelcomeClient {
      * @returns true if authentication successful
      */
     async login(): Promise<boolean> {
+        this.sessionId = null;
+        delete this.client.defaults.headers.common["Cookie"];
         try {
-            this.log(`Attempting login to ${this.gatewayIp}:${this.gatewayPort}...`);
-
-            // Try login with JSON body
-            const response = await this.client.post(this.config.loginEndpoint, {
+            const password = encodeURIComponent(this.password).replace(
+                /[!'()*]/g,
+                (character) => `%${character.charCodeAt(0).toString(16).toUpperCase()}`,
+            );
+            const response = await this.client.post("/cgi-bin/checklogin.cgi", {
                 username: this.username,
-                password: this.password,
+                password,
             });
 
-            this.log(`Login response status: ${response.status}`);
-            this.log(`Response headers: ${JSON.stringify(response.headers, null, 2)}`);
-            this.log(`Response data: ${JSON.stringify(response.data)}`);
-
-            // Try multiple session extraction methods
-            // Method 1: Extract from Set-Cookie header
-            const setCookie = response.headers["set-cookie"];
-            if (setCookie) {
-                const cookieStr = Array.isArray(setCookie) ? setCookie[0] : setCookie;
-                this.log(`Found Set-Cookie: ${cookieStr}`);
-                
-                // Try SESSIONID
-                let sessionMatch = cookieStr.match(/SESSIONID=([^;]+)/i);
-                if (sessionMatch) {
-                    this.sessionId = sessionMatch[1];
-                    this.log(`Extracted sessionId (SESSIONID): ${this.sessionId}`);
-                    this.client.defaults.headers.common["Cookie"] = `SESSIONID=${this.sessionId}`;
-                    return true;
-                }
-
-                // Try other common session cookie names
-                sessionMatch = cookieStr.match(/(SID|SESSION|JSESSIONID|PHPSESSID)=([^;]+)/i);
-                if (sessionMatch) {
-                    this.sessionId = sessionMatch[2];
-                    this.log(`Extracted sessionId (${sessionMatch[1]}): ${this.sessionId}`);
-                    this.client.defaults.headers.common["Cookie"] = `${sessionMatch[1]}=${this.sessionId}`;
-                    return true;
-                }
+            if (response.status !== 200 || !["1", "2"].includes(String(response.data).trim())) {
+                this.log(`Gateway login rejected (HTTP ${response.status})`);
+                return false;
             }
-
-            // Method 2: Check response body for session info
-            if (response.data?.sessionId) {
-                this.sessionId = response.data.sessionId;
-                this.log(`Found sessionId in response.data: ${this.sessionId}`);
-                this.client.defaults.headers.common["Authorization"] = `Bearer ${this.sessionId}`;
-                return true;
+            const cookies = (response.headers["set-cookie"] || [])
+                .map((cookie) => cookie.split(";", 1)[0])
+                .filter((cookie) => /^[^=;\s]+=[^;]+$/.test(cookie));
+            if (cookies.length === 0) {
+                this.log("Gateway login did not return a session cookie");
+                return false;
             }
-
-            // Method 3: Check for auth token
-            if (response.data?.token) {
-                this.sessionId = response.data.token;
-                this.log(`Found token in response.data: ${this.sessionId}`);
-                this.client.defaults.headers.common["Authorization"] = `Bearer ${this.sessionId}`;
-                return true;
-            }
-
-            // Method 4: Success on 200/201 with any response (implicit auth)
-            if (response.status === 200 || response.status === 201) {
-                this.log("Login succeeded (implicit auth based on 200 response)");
-                // Store response data as fallback
-                this.sessionId = "authenticated";
-                return true;
-            }
-
-            this.log("No session identifier found in response");
-            return false;
+            this.client.defaults.headers.common["Cookie"] = cookies.join("; ");
+            this.sessionId = "authenticated";
+            return true;
         } catch (error) {
-            this.log(`Login failed: ${error instanceof Error ? error.message : String(error)}`);
-            if (axios.isAxiosError(error)) {
-                this.log(`Response status: ${error.response?.status}`);
-                this.log(`Response data: ${JSON.stringify(error.response?.data)}`);
-            }
+            this.logRequestFailure("Gateway login", error);
             return false;
+        }
+    }
+
+    private logRequestFailure(operation: string, error: unknown): void {
+        if (axios.isAxiosError(error)) {
+            this.log(`${operation} failed (${error.response ? `HTTP ${error.response.status}` : error.code || "network error"})`);
+        } else {
+            this.log(`${operation} failed (unexpected error)`);
         }
     }
 
@@ -196,13 +154,29 @@ export class WelcomeClient {
      * @returns true if gateway responds
      */
     async checkHealth(): Promise<boolean> {
+        if (!this.sessionId) {
+            return false;
+        }
         try {
-            const response = await this.client.get(
-                this.config.healthCheckEndpoint,
+            const origin = `http${this.gatewayPort === 443 ? "s" : ""}://${this.gatewayIp}:${this.gatewayPort}`;
+            const response = await this.client.post(
+                "/cgi-bin/portalclient.cgi",
+                JSON.stringify({ op: "6" }),
+                {
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "Origin": origin,
+                        "Referer": `${origin}/config.html?v=0.1`,
+                    },
+                },
             );
-            // TODO: Adapt health check response validation to actual endpoint.
-            return response.status === 200;
+            if (response.status === 200 && typeof response.data?.uuid === "string" && response.data.uuid) {
+                return true;
+            }
+            this.log(`Gateway health check returned an invalid response (HTTP ${response.status})`);
+            return false;
         } catch (error) {
+            this.logRequestFailure("Gateway health check", error);
             return false;
         }
     }

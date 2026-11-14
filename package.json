@@ -14,7 +14,7 @@
   },
   "main": "build/main.js",
   "scripts": {
-    "test": "node test/admin-config.js",
+    "test": "npm run build && node test/admin-config.js && node test/gateway-login.js",
     "lint": "eslint src --ext .ts",
     "build": "tsc",
     "watch": "tsc --watch",

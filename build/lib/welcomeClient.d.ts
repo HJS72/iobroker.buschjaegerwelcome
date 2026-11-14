@@ -22,6 +22,7 @@ export declare class WelcomeClient {
      * @returns true if authentication successful
      */
     login(): Promise<boolean>;
+    private logRequestFailure;
     /**
      * Trigger door opener via gateway API.
      * @param doorId ID of the door/opener (default 0 for primary door)

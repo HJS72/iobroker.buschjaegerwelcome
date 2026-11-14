@@ -73,12 +73,12 @@ class BuschJaegerWelcomeAdapter extends utils.Adapter {
             await this.initializeObjects();
 
             // Try to connect to gateway
-            const connected = await this.welcomeClient.login();
+            const connected = await this.welcomeClient.login() && await this.welcomeClient.checkHealth();
             if (connected) {
                 this.log.info("Successfully authenticated with gateway");
                 await this.setState("info.connection", true, true);
             } else {
-                this.log.warn("Could not authenticate with gateway");
+                this.log.warn("Gateway login or authenticated health check failed");
                 await this.setState("info.connection", false, true);
             }
 
@@ -394,7 +394,7 @@ class BuschJaegerWelcomeAdapter extends utils.Adapter {
             if (!isHealthy) {
                 this.log.warn("Gateway health check failed");
                 // Attempt reconnection
-                const reconnected = await this.welcomeClient.login();
+                const reconnected = await this.welcomeClient.login() && await this.welcomeClient.checkHealth();
                 if (reconnected) {
                     this.log.info("Reconnected to gateway");
                     await this.setState(`${this.namespace}.info.connection`, true, true);

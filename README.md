@@ -14,7 +14,7 @@ Control and monitor a **Busch-Jaeger Welcome IP Gateway** (models 83341/83342) l
 ## Installation
 
 1. Install the adapter in ioBroker (Admin 6 or newer required)
-2. Configure gateway IP, port, and credentials in adapter settings
+2. Configure gateway IP, HTTPS port (normally 443), and local gateway admin credentials in adapter settings
 3. Set local SIP listener port (default: 5060) if needed
 
 ## Configuration
@@ -22,7 +22,7 @@ Control and monitor a **Busch-Jaeger Welcome IP Gateway** (models 83341/83342) l
 ### Basic Settings
 - **Gateway IP Address**: Local IP of your Welcome IP Gateway (e.g., 192.168.1.100)
 - **Gateway Port**: HTTP port (default: 80, or 443 for HTTPS)
-- **Username**: Login credentials (from MyBuildings portal or local admin)
+- **Username**: Local gateway administrator username (not the MyBuildings account)
 - **Password**: Authentication password (stored unencrypted in adapter configuration)
 
 ### Advanced Settings
@@ -50,18 +50,16 @@ Control and monitor a **Busch-Jaeger Welcome IP Gateway** (models 83341/83342) l
 
 ## API Endpoint Configuration
 
-The adapter includes placeholders for Welcome API endpoints in `src/lib/welcomeClient.ts`.
-Verify and adjust these based on your gateway's actual API by:
+The adapter uses the gateway's local CGI login and portal information endpoints
+for authentication and health checks. Compatibility with individual firmware
+versions must be verified on the gateway.
 
-1. Capturing network traffic with Wireshark during login/control
-2. Inspecting browser DevTools when using the gateway web interface
-3. Checking gateway documentation
+The door-opener and snapshot endpoints are still unverified placeholders. Verify
+them against the gateway firmware before relying on those features; see
+`API_CUSTOMIZATION_GUIDE.md`.
 
-Key endpoints requiring adaptation:
-- `loginEndpoint`: Default `/admin/login`
-- `doorbellOpenEndpoint`: Default `/command/unlock`
-- `snapshotEndpoint`: Default `/video/snapshot.jpg`
-- `healthCheckEndpoint`: Default `/admin/status`
+The CGI request format is based on the public
+[ABB Welcome integration](https://github.com/rankjie/ha-abb-welcome).
 
 ## Security Considerations
 
@@ -78,9 +76,9 @@ Key endpoints requiring adaptation:
 
 ### Cannot Connect to Gateway
 - Verify gateway IP and port are correct
-- Check username/password are valid
+- Check the local gateway admin username/password in the gateway web interface
 - Ensure HTTP/HTTPS port is accessible from ioBroker host
-- Review adapter logs for authentication errors
+- Enable debug logging and review the HTTP status or network error, without sharing credentials or session cookies
 
 ### No Snapshots
 - Verify camera is functional on gateway web interface
