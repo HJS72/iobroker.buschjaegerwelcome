@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Busch-Jaeger Welcome - Configuration</title>
+        <link rel="stylesheet" href="../../lib/css/jquery.multiselect.css" />
+        <link rel="stylesheet" href="../../lib/css/jquery-ui.min.css" />
+        <link rel="stylesheet" href="../../css/adapter.css" />
+        <script src="../../lib/js/jquery-3.2.1.min.js"></script>
+        <script src="../../lib/js/jquery-ui.min.js"></script>
+        <script src="../../lib/js/jquery.multiselect.js"></script>
+        <script src="../../js/translate.js"></script>
+        <script src="../../js/adapter-settings.js"></script>
+        <style>
+            .cTitle {
+                margin: 0;
+            }
+            .cPanel {
+                margin-bottom: 10px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                padding: 10px;
+                background-color: #f9f9f9;
+            }
+            .cPanel h3 {
+                margin-top: 0;
+            }
+            .form-group {
+                margin-bottom: 15px;
+            }
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+                font-weight: bold;
+            }
+            .form-group input[type="text"],
+            .form-group input[type="password"],
+            .form-group input[type="number"] {
+                width: 100%;
+                padding: 8px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                box-sizing: border-box;
+            }
+            .help-text {
+                display: block;
+                font-size: 12px;
+                color: #666;
+                margin-top: 3px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="adapter-settings">
+            <div class="cPanel">
+                <h3 class="cTitle">Gateway Settings</h3>
+
+                <div class="form-group">
+                    <label for="gatewayIp">Gateway IP Address</label>
+                    <input type="text" id="gatewayIp" class="value" />
+                    <span class="help-text">IP address of the Busch-Jaeger Welcome IP Gateway in your local network</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="gatewayPort">Gateway Port</label>
+                    <input type="number" id="gatewayPort" class="value" min="1" max="65535" />
+                    <span class="help-text">Port of the gateway (default: 80 for HTTP, 443 for HTTPS)</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" class="value" />
+                    <span class="help-text">Login username for the gateway (from MyBuildings portal or local admin)</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="value" />
+                    <span class="help-text">Password for authentication (encrypted in configuration)</span>
+                </div>
+            </div>
+
+            <div class="cPanel">
+                <h3 class="cTitle">Advanced Settings</h3>
+
+                <div class="form-group">
+                    <label for="sipPort">Local SIP Listener Port</label>
+                    <input type="number" id="sipPort" class="value" min="1" max="65535" />
+                    <span class="help-text">Local UDP port for listening to SIP INVITE packets (default: 5060, alternative: 5065)</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="pollInterval">Poll Interval (seconds)</label>
+                    <input type="number" id="pollInterval" class="value" min="5" max="3600" />
+                    <span class="help-text">Interval for health checks and connection status updates</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="doorOpenDuration">Ring Auto-Reset Duration (seconds)</label>
+                    <input type="number" id="doorOpenDuration" class="value" min="1" max="60" />
+                    <span class="help-text">Time before 'ring' state automatically resets to false</span>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Save on change for all input fields
+            $(".adapter-settings").on("change", ".value", function () {
+                onChange();
+            });
+        </script>
+    </body>
+</html>

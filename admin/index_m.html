@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Busch-Jaeger Welcome - Configuration</title>
+        <link rel="stylesheet" href="../../lib/css/materialize.css" />
+        <link rel="stylesheet" href="../../css/adapter.css" />
+        <style>
+            .title {
+                margin: 0;
+            }
+            .table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            .table td {
+                border-bottom: 1px solid #ddd;
+                padding: 15px;
+            }
+            .table tr:hover {
+                background-color: #f5f5f5;
+            }
+            input[type="text"],
+            input[type="password"],
+            input[type="number"] {
+                width: 100%;
+            }
+            .help-text {
+                display: block;
+                font-size: 12px;
+                color: #999;
+                margin-top: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="adapter-container">
+            <div class="row">
+                <div class="col s12">
+                    <ul class="tabs">
+                        <li class="tab col s3"><a href="#tab-settings" class="active">Settings</a></li>
+                        <li class="tab col s3"><a href="#tab-advanced">Advanced</a></li>
+                    </ul>
+                </div>
+                <div id="tab-settings" class="col s12">
+                    <div class="row">
+                        <div class="col s12">
+                            <h4 class="title">Gateway Configuration</h4>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12 m6">
+                            <div class="input-field">
+                                <input type="text" id="gatewayIp" />
+                                <label for="gatewayIp">Gateway IP Address</label>
+                                <span class="help-text">IP address of the Busch-Jaeger Welcome IP Gateway in your local network</span>
+                            </div>
+                        </div>
+                        <div class="col s12 m6">
+                            <div class="input-field">
+                                <input type="number" id="gatewayPort" min="1" max="65535" />
+                                <label for="gatewayPort">Gateway Port</label>
+                                <span class="help-text">Port of the gateway (default: 80 for HTTP, 443 for HTTPS)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12 m6">
+                            <div class="input-field">
+                                <input type="text" id="username" />
+                                <label for="username">Username</label>
+                                <span class="help-text">Login username for the gateway (from MyBuildings portal or local admin)</span>
+                            </div>
+                        </div>
+                        <div class="col s12 m6">
+                            <div class="input-field">
+                                <input type="password" id="password" />
+                                <label for="password">Password</label>
+                                <span class="help-text">Password for authentication (encrypted in configuration)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="tab-advanced" class="col s12">
+                    <div class="row">
+                        <div class="col s12">
+                            <h4 class="title">Advanced Settings</h4>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12 m4">
+                            <div class="input-field">
+                                <input type="number" id="sipPort" min="1" max="65535" />
+                                <label for="sipPort">Local SIP Listener Port</label>
+                                <span class="help-text">Local UDP port for listening to SIP INVITE packets (default: 5060, alternative: 5065)</span>
+                            </div>
+                        </div>
+                        <div class="col s12 m4">
+                            <div class="input-field">
+                                <input type="number" id="pollInterval" min="5" max="3600" />
+                                <label for="pollInterval">Poll Interval (seconds)</label>
+                                <span class="help-text">Interval for health checks and connection status updates</span>
+                            </div>
+                        </div>
+                        <div class="col s12 m4">
+                            <div class="input-field">
+                                <input type="number" id="doorOpenDuration" min="1" max="60" />
+                                <label for="doorOpenDuration">Ring Auto-Reset (seconds)</label>
+                                <span class="help-text">Time before 'ring' state automatically resets to false</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="../../lib/js/jquery-3.2.1.min.js"></script>
+        <script src="../../lib/js/materialize.js"></script>
+        <script src="../../js/translate.js"></script>
+        <script src="../../js/adapter-settings.js"></script>
+        <script>
+            // Save on change
+            $(".adapter-container").on("change", "input", function () {
+                onChange();
+            });
+
+            // Load settings
+            function load(settings, onChange) {
+                // Load each field
+                for (let key in settings) {
+                    if ($(`#${key}`).attr("type") === "checkbox") {
+                        $(`#${key}`).prop("checked", settings[key]).trigger("change");
+                    } else {
+                        $(`#${key}`).val(settings[key]).trigger("change");
+                    }
+                }
+
+                // Initialize Materialize
+                M.updateTextFields();
+                M.Tabs.init(document.querySelectorAll(".tabs"));
+
+                if (onChange) {
+                    onChange(false);
+                }
+            }
+
+            // Save settings
+            function save(callback) {
+                let obj = {};
+                $(".adapter-container").find("input").each(function () {
+                    let $this = $(this);
+                    let id = $this.attr("id");
+                    if ($this.attr("type") === "checkbox") {
+                        obj[id] = $this.prop("checked");
+                    } else {
+                        obj[id] = $this.val();
+                    }
+                });
+
+                if (callback) callback(obj);
+            }
+        </script>
+    </body>
+</html>
