@@ -10,11 +10,22 @@
         body { padding: 20px; }
         h4 { margin-top: 25px; margin-bottom: 15px; font-weight: 500; color: #000; }
         .input-field { margin-bottom: 20px; }
-        .input-field > label { color: #000 !important; font-weight: 500; }
+        .input-field > label { color: #333 !important; font-weight: 500; }
+        .input-field > label.active { color: #2196f3 !important; }
         input { color: #000 !important; background-color: #fff !important; }
+        input:-webkit-autofill { background-color: #fff !important; -webkit-text-fill-color: #000 !important; }
+        .buttons { margin-top: 30px; display: flex; gap: 10px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 2px; cursor: pointer; font-size: 14px; }
+        .btn-primary { background-color: #2196f3; color: #fff; }
+        .btn-primary:hover { background-color: #1976d2; }
+        .btn-secondary { background-color: #f5f5f5; color: #333; border: 1px solid #ddd; }
+        .btn-secondary:hover { background-color: #e0e0e0; }
         body.dark h4 { color: #fff; }
-        body.dark .input-field > label { color: #fff !important; }
+        body.dark .input-field > label { color: #ccc !important; }
+        body.dark .input-field > label.active { color: #64b5f6 !important; }
         body.dark input { color: #fff !important; background-color: #555 !important; }
+        body.dark .btn-secondary { background-color: #333; color: #fff; border-color: #555; }
+        body.dark .btn-secondary:hover { background-color: #444; }
     </style>
 </head>
 <body>
@@ -50,6 +61,12 @@
         <label for="doorOpenDuration">Ring Duration</label>
     </div>
 
+    <div class="buttons">
+        <button class="btn btn-primary" onclick="window.save()">Save</button>
+        <button class="btn btn-primary" onclick="window.saveClose()">Save & Close</button>
+        <button class="btn btn-secondary" onclick="window.cancel()">Cancel</button>
+    </div>
+
     <script src="../../lib/js/jquery-3.2.1.min.js"></script>
     <script src="../../lib/js/materialize.js"></script>
     <script>
@@ -66,7 +83,20 @@
             $('#pollInterval').val(settings.pollInterval || 30);
             $('#doorOpenDuration').val(settings.doorOpenDuration || 5);
             if (typeof M !== 'undefined') M.updateTextFields();
-            $('.value').on('change', function() { window.onChange(); });
+            // Trigger label active state for filled inputs
+            $('.value').each(function() {
+                if ($(this).val()) {
+                    $(this).siblings('label').addClass('active');
+                }
+            });
+            $('.value').on('change', function() { 
+                if ($(this).val()) {
+                    $(this).siblings('label').addClass('active');
+                } else {
+                    $(this).siblings('label').removeClass('active');
+                }
+                window.onChange(); 
+            });
             if (onDone) onDone();
         };
 
@@ -92,6 +122,20 @@
             } else {
                 console.log('sendTo not found');
                 if (callback) callback();
+            }
+        };
+
+        window.saveClose = function () {
+            window.save(function() {
+                if (typeof window.parent !== 'undefined' && window.parent !== window) {
+                    window.parent.postMessage({type: 'close'}, '*');
+                }
+            });
+        };
+
+        window.cancel = function () {
+            if (typeof window.parent !== 'undefined' && window.parent !== window) {
+                window.parent.postMessage({type: 'close'}, '*');
             }
         };
 
