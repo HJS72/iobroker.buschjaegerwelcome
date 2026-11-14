@@ -3,12 +3,57 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Busch-Jaeger Welcome - Configuration</title>
+    <title>Busch-Jaeger Welcome - Settings</title>
     <link rel="stylesheet" href="../../lib/css/jquery-ui.min.css" />
     <link rel="stylesheet" href="../../css/adapter.css" />
+    <style>
+        body { padding: 20px; }
+        .setting { margin-bottom: 20px; }
+        input { color: #000 !important; background: #fff !important; }
+        body.dark input { color: #fff !important; background: #555 !important; }
+        .btn { margin: 5px; cursor: pointer; }
+        h4 { margin-top: 30px; }
+    </style>
 </head>
 <body>
-    <div class="adapter-container"></div>
+    <h3 data-i18n="buschjaegerwelcome">Busch-Jaeger Welcome</h3>
+    
+    <h4>Gateway Settings</h4>
+    <div class="setting">
+        <label for="gatewayIp" data-i18n="gateway_ip"></label>
+        <input class="value" id="gatewayIp" type="text" />
+    </div>
+    <div class="setting">
+        <label for="gatewayPort" data-i18n="gateway_port"></label>
+        <input class="value" id="gatewayPort" type="number" min="1" max="65535" />
+    </div>
+    <div class="setting">
+        <label for="username" data-i18n="username"></label>
+        <input class="value" id="username" type="text" />
+    </div>
+    <div class="setting">
+        <label for="password" data-i18n="password"></label>
+        <input class="value" id="password" type="password" />
+    </div>
+    
+    <h4>Advanced Settings</h4>
+    <div class="setting">
+        <label for="sipPort" data-i18n="sip_port"></label>
+        <input class="value" id="sipPort" type="number" min="1" max="65535" />
+    </div>
+    <div class="setting">
+        <label for="pollInterval" data-i18n="poll_interval"></label>
+        <input class="value" id="pollInterval" type="number" min="5" max="3600" />
+    </div>
+    <div class="setting">
+        <label for="doorOpenDuration" data-i18n="door_open_duration"></label>
+        <input class="value" id="doorOpenDuration" type="number" min="1" max="60" />
+    </div>
+
+    <div style="margin-top: 30px;">
+        <button id="save" class="btn btn-primary" data-i18n="save">Save</button>
+        <button id="cancel" class="btn btn-default" data-i18n="cancel">Cancel</button>
+    </div>
 
     <script src="../../lib/js/jquery-3.2.1.min.js"></script>
     <script src="../../lib/js/jquery-ui.min.js"></script>

@@ -1,18 +1,12 @@
 {
-  "settings": "Settings",
-  "advanced": "Advanced",
+  "buschjaegerwelcome": "Busch-Jaeger Welcome IP Gateway",
   "gateway_ip": "Gateway IP Address",
-  "gateway_ip_help": "IP address of the Busch-Jaeger Welcome IP Gateway in your local network",
   "gateway_port": "Gateway Port",
-  "gateway_port_help": "Port of the gateway (default: 80 for HTTP, 443 for HTTPS)",
   "username": "Username",
-  "username_help": "Login username for the gateway (from MyBuildings portal or local admin)",
   "password": "Password",
-  "password_help": "Password for authentication (encrypted in configuration)",
-  "sip_port": "Local SIP Listener Port",
-  "sip_port_help": "Local UDP port for listening to SIP INVITE packets (default: 5060, alternative: 5065)",
+  "sip_port": "Local SIP Port",
   "poll_interval": "Poll Interval (seconds)",
-  "poll_interval_help": "Interval for health checks and connection status updates",
-  "door_open_duration": "Doorbell Ring Auto-Reset (seconds)",
-  "door_open_duration_help": "Time in seconds after which the 'ring' state automatically resets to false"
+  "door_open_duration": "Ring Auto-Reset (seconds)",
+  "save": "Save",
+  "cancel": "Cancel"
 }
