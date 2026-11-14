@@ -23,11 +23,13 @@ class WelcomeClient {
             snapshotEndpoint: "/video/snapshot.jpg",
         };
         // Create axios instance with SSL bypass for self-signed certificates
+        this.httpsAgent = new https_1.default.Agent({
+            rejectUnauthorized: false,
+            keepAlive: true,
+        });
         this.client = axios_1.default.create({
             baseURL: `http${gatewayPort === 443 ? "s" : ""}://${gatewayIp}:${gatewayPort}`,
-            httpsAgent: new https_1.default.Agent({
-                rejectUnauthorized: false,
-            }),
+            httpsAgent: this.httpsAgent,
             timeout: 10000,
         });
     }
@@ -51,9 +53,13 @@ class WelcomeClient {
         delete this.client.defaults.headers.common["Cookie"];
         try {
             const password = encodeURIComponent(this.password).replace(/[!'()*]/g, (character) => `%${character.charCodeAt(0).toString(16).toUpperCase()}`);
-            const response = await this.client.post("/cgi-bin/checklogin.cgi", {
-                username: this.username,
-                password,
+            const origin = new URL(`http${this.gatewayPort === 443 ? "s" : ""}://${this.gatewayIp}:${this.gatewayPort}`).origin;
+            const response = await this.client.post("/cgi-bin/checklogin.cgi", JSON.stringify({ username: this.username, password }), {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "Origin": origin,
+                    "Referer": `${origin}/`,
+                },
             });
             if (response.status !== 200 || !["1", "2"].includes(String(response.data).trim())) {
                 this.log(`Gateway login rejected (HTTP ${response.status})`);
@@ -67,6 +73,7 @@ class WelcomeClient {
                 return false;
             }
             this.client.defaults.headers.common["Cookie"] = cookies.join("; ");
+            this.log(`Gateway login returned code ${String(response.data).trim()} and ${cookies.length} cookie(s)`);
             this.sessionId = "authenticated";
             return true;
         }
@@ -133,18 +140,22 @@ class WelcomeClient {
             return false;
         }
         try {
-            const origin = `http${this.gatewayPort === 443 ? "s" : ""}://${this.gatewayIp}:${this.gatewayPort}`;
-            const response = await this.client.post("/cgi-bin/portalclient.cgi", JSON.stringify({ op: "6" }), {
+            const origin = new URL(`http${this.gatewayPort === 443 ? "s" : ""}://${this.gatewayIp}:${this.gatewayPort}`).origin;
+            const response = await this.client.get("/cgi-bin/getinfo.cgi?type=getversion", {
+                responseType: "text",
                 headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                    "Origin": origin,
+                    "Content-Type": "text/html",
                     "Referer": `${origin}/config.html?v=0.1`,
                 },
             });
-            if (response.status === 200 && typeof response.data?.uuid === "string" && response.data.uuid) {
+            const body = typeof response.data === "string" ? response.data.trim() : "";
+            const parts = body.split(";");
+            if (response.status === 200 && parts.length >= 3 && parts.slice(0, 3).every((part) => part.trim())) {
                 return true;
             }
-            this.log(`Gateway health check returned an invalid response (HTTP ${response.status})`);
+            const reason = body === "-6" ? "session rejected (-6)" :
+                !body ? "empty response" : `unexpected version format (${parts.length} fields)`;
+            this.log(`Gateway health check: ${reason} (HTTP ${response.status})`);
             return false;
         }
         catch (error) {
@@ -156,7 +167,7 @@ class WelcomeClient {
      * Close client and clean up resources.
      */
     close() {
-        // Axios doesn't require explicit cleanup, but can add if needed
+        this.httpsAgent.destroy();
     }
 }
 exports.WelcomeClient = WelcomeClient;

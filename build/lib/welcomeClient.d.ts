@@ -8,6 +8,7 @@ export declare class WelcomeClient {
     private username;
     private password;
     private client;
+    private httpsAgent;
     private sessionId;
     private config;
     private logger;

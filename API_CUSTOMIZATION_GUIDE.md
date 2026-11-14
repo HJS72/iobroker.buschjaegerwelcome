@@ -1,10 +1,9 @@
 # Gateway API Configuration
 
 The adapter uses `POST /cgi-bin/checklogin.cgi` for local gateway admin login and
-`POST /cgi-bin/portalclient.cgi` with operation `6` for the authenticated health
-check. The request format is based on the public
-[ABB Welcome integration](https://github.com/rankjie/ha-abb-welcome); it has not
-been verified against every firmware version.
+`GET /cgi-bin/getinfo.cgi?type=getversion` for the authenticated health check.
+These requests follow the gateway web interface and have not been verified
+against every firmware version.
 
 Use the gateway's local administrator credentials, not the MyBuildings portal
 credentials. For an HTTPS gateway using the standard port, set the gateway port

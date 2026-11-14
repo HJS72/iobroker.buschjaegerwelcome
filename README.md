@@ -50,7 +50,7 @@ Control and monitor a **Busch-Jaeger Welcome IP Gateway** (models 83341/83342) l
 
 ## API Endpoint Configuration
 
-The adapter uses the gateway's local CGI login and portal information endpoints
+The adapter uses the gateway's local CGI login and version information endpoints
 for authentication and health checks. Compatibility with individual firmware
 versions must be verified on the gateway.
 
@@ -86,6 +86,18 @@ The CGI request format is based on the public
 - Ensure session is authenticated before snapshot requests
 
 ## Development
+
+### Local gateway login test
+
+Run `npm run testapp` and open <http://127.0.0.1:3000/> on the same machine.
+Set `PORT` to use another local port. When running on a remote ioBroker host,
+use an SSH tunnel, for example `ssh -L 3000:127.0.0.1:3000 <host>`, and open
+the URL locally.
+
+Enter the gateway IPv4 address and local administrator credentials. The app
+performs the adapter's login and authenticated health check without saving or
+logging the credentials. Port 443 uses HTTPS with certificate validation
+disabled; other gateway ports use unencrypted HTTP.
 
 ### Build
 ```bash
