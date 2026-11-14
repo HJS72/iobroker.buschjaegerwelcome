@@ -8,12 +8,12 @@ Control and monitor a **Busch-Jaeger Welcome IP Gateway** (models 83341/83342) l
 - **Door Control**: Trigger door opener relay via local API
 - **Camera Snapshots**: Retrieve door camera images on-demand or during ring events
 - **Health Monitoring**: Periodic connection checks and automatic reconnection
-- **Secure Credentials**: Password encrypted in adapter configuration
+- **Masked Credentials**: Password hidden in adapter settings
 - **Full TypeScript Support**: Strict typing, no `any` types
 
 ## Installation
 
-1. Install the adapter in ioBroker
+1. Install the adapter in ioBroker (Admin 6 or newer required)
 2. Configure gateway IP, port, and credentials in adapter settings
 3. Set local SIP listener port (default: 5060) if needed
 
@@ -23,7 +23,7 @@ Control and monitor a **Busch-Jaeger Welcome IP Gateway** (models 83341/83342) l
 - **Gateway IP Address**: Local IP of your Welcome IP Gateway (e.g., 192.168.1.100)
 - **Gateway Port**: HTTP port (default: 80, or 443 for HTTPS)
 - **Username**: Login credentials (from MyBuildings portal or local admin)
-- **Password**: Authentication password (encrypted)
+- **Password**: Authentication password (stored unencrypted in adapter configuration)
 
 ### Advanced Settings
 - **SIP Listener Port**: Local UDP port for monitoring doorbell events (default: 5060)
@@ -65,7 +65,7 @@ Key endpoints requiring adaptation:
 
 ## Security Considerations
 
-- Passwords are encrypted in adapter configuration
+- Passwords are stored unencrypted in adapter configuration
 - HTTPS gateway connections bypass self-signed certificate validation (required for local gateways)
 - SIP listener is passive (does not respond to packets, avoiding interference)
 

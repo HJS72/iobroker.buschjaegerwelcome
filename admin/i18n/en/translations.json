@@ -1,5 +1,7 @@
 {
   "buschjaegerwelcome": "Busch-Jaeger Welcome IP Gateway",
+  "gateway_settings": "Gateway Settings",
+  "advanced_settings": "Advanced Settings",
   "gateway_ip": "Gateway IP Address",
   "gateway_port": "Gateway Port",
   "username": "Username",

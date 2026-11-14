@@ -22,7 +22,14 @@
     "compact": false,
     "enabled": true,
     "type": "hardware",
-    "materialize": true,
+    "adminUI": {
+      "config": "json"
+    },
+    "globalDependencies": [
+      {
+        "admin": ">=6.0.0"
+      }
+    ],
     "socketio": false,
     "messagebox": false,
     "objects": false,

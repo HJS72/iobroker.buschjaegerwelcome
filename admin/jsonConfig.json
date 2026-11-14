@@ -1,78 +1,60 @@
 {
   "i18n": true,
-  "title": "Busch-Jaeger Welcome IP Gateway Settings",
-  "tabs": [
-    {
-      "link": "tab-settings",
-      "name": "settings",
-      "icon": "settings",
-      "items": [
-        {
-          "type": "number",
-          "newLine": true,
-          "key": "gatewayPort",
-          "label": "gateway_port",
-          "default": 80,
-          "min": 1,
-          "max": 65535,
-          "help": "gateway_port_help"
-        },
-        {
-          "type": "text",
-          "key": "gatewayIp",
-          "label": "gateway_ip",
-          "placeholder": "192.168.1.100",
-          "required": true,
-          "help": "gateway_ip_help"
-        },
-        {
-          "type": "text",
-          "key": "username",
-          "label": "username",
-          "help": "username_help"
-        },
-        {
-          "type": "password",
-          "key": "password",
-          "label": "password",
-          "help": "password_help"
-        }
-      ]
+  "type": "panel",
+  "items": {
+    "_gatewayHeader": {
+      "type": "header",
+      "text": "gateway_settings",
+      "size": 3
     },
-    {
-      "link": "tab-advanced",
-      "name": "advanced",
-      "icon": "extension",
-      "items": [
-        {
-          "type": "number",
-          "newLine": true,
-          "key": "sipPort",
-          "label": "sip_port",
-          "default": 5060,
-          "min": 1,
-          "max": 65535,
-          "help": "sip_port_help"
-        },
-        {
-          "type": "number",
-          "key": "pollInterval",
-          "label": "poll_interval",
-          "default": 30,
-          "min": 5,
-          "max": 3600,
-          "help": "poll_interval_help"
-        },
-        {
-          "type": "number",
-          "key": "doorOpenDuration",
-          "label": "door_open_duration",
-          "default": 5,
-          "min": 1,
-          "max": 60,
-          "help": "door_open_duration_help"
-        }
-      ]
+    "gatewayIp": {
+      "type": "text",
+      "label": "gateway_ip",
+      "placeholder": "192.168.1.100",
+      "sm": 6
+    },
+    "gatewayPort": {
+      "type": "number",
+      "label": "gateway_port",
+      "min": 1,
+      "max": 65535,
+      "sm": 6
+    },
+    "username": {
+      "type": "text",
+      "label": "username",
+      "sm": 6
+    },
+    "password": {
+      "type": "password",
+      "label": "password",
+      "sm": 6
+    },
+    "_advancedHeader": {
+      "type": "header",
+      "text": "advanced_settings",
+      "size": 3
+    },
+    "sipPort": {
+      "type": "number",
+      "label": "sip_port",
+      "min": 1,
+      "max": 65535,
+      "sm": 6
+    },
+    "pollInterval": {
+      "type": "number",
+      "label": "poll_interval",
+      "min": 5,
+      "max": 3600,
+      "sm": 6
+    },
+    "doorOpenDuration": {
+      "type": "number",
+      "label": "door_open_duration",
+      "min": 1,
+      "max": 60,
+      "sm": 6
     }
-  ]
+  }
 }
