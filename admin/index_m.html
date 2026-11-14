@@ -9,10 +9,14 @@
     <style>
         body { padding: 20px; }
         .setting { margin-bottom: 20px; }
+        label { color: #000 !important; display: block; margin-bottom: 5px; font-weight: 500; }
+        body.dark label { color: #fff !important; }
         input { color: #000 !important; background: #fff !important; }
+        input::placeholder { color: rgba(0,0,0,0.4) !important; }
         body.dark input { color: #fff !important; background: #555 !important; }
-        .btn { margin: 5px; cursor: pointer; }
-        h4 { margin-top: 30px; }
+        body.dark input::placeholder { color: rgba(255,255,255,0.4) !important; }
+        h4 { margin-top: 30px; margin-bottom: 15px; color: #000; }
+        body.dark h4 { color: #fff; }
     </style>
 </head>
 <body>
@@ -20,39 +24,34 @@
     
     <h4>Gateway Settings</h4>
     <div class="setting">
-        <label for="gatewayIp" data-i18n="gateway_ip"></label>
+        <label for="gatewayIp" data-i18n="gateway_ip">Gateway IP Address</label>
         <input class="value" id="gatewayIp" type="text" />
     </div>
     <div class="setting">
-        <label for="gatewayPort" data-i18n="gateway_port"></label>
+        <label for="gatewayPort" data-i18n="gateway_port">Gateway Port</label>
         <input class="value" id="gatewayPort" type="number" min="1" max="65535" />
     </div>
     <div class="setting">
-        <label for="username" data-i18n="username"></label>
+        <label for="username" data-i18n="username">Username</label>
         <input class="value" id="username" type="text" />
     </div>
     <div class="setting">
-        <label for="password" data-i18n="password"></label>
+        <label for="password" data-i18n="password">Password</label>
         <input class="value" id="password" type="password" />
     </div>
     
     <h4>Advanced Settings</h4>
     <div class="setting">
-        <label for="sipPort" data-i18n="sip_port"></label>
+        <label for="sipPort" data-i18n="sip_port">Local SIP Port</label>
         <input class="value" id="sipPort" type="number" min="1" max="65535" />
     </div>
     <div class="setting">
-        <label for="pollInterval" data-i18n="poll_interval"></label>
+        <label for="pollInterval" data-i18n="poll_interval">Poll Interval</label>
         <input class="value" id="pollInterval" type="number" min="5" max="3600" />
     </div>
     <div class="setting">
-        <label for="doorOpenDuration" data-i18n="door_open_duration"></label>
+        <label for="doorOpenDuration" data-i18n="door_open_duration">Ring Auto-Reset</label>
         <input class="value" id="doorOpenDuration" type="number" min="1" max="60" />
-    </div>
-
-    <div style="margin-top: 30px;">
-        <button id="save" class="btn btn-primary waves-effect" data-i18n="save">Save</button>
-        <button id="cancel" class="btn btn-default waves-effect" data-i18n="cancel">Cancel</button>
     </div>
 
     <script src="../../lib/js/jquery-3.2.1.min.js"></script>

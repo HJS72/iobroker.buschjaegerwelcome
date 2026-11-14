@@ -1,10 +1,12 @@
 'use strict';
 
 let settings = {};
+let changed = false;
 
 // Load settings from adapter config
 function load(settings, onDone) {
     window.settings = settings;
+    changed = false;
     
     // Populate form fields from settings
     $('#gatewayIp').val(settings.gatewayIp || '');
@@ -18,6 +20,11 @@ function load(settings, onDone) {
     if (onDone && typeof onDone === 'function') {
         onDone();
     }
+}
+
+// Change handler - marks settings as changed
+function onChange() {
+    changed = true;
 }
 
 // Save settings back to adapter config
@@ -36,6 +43,7 @@ function save(callback) {
     // Send to ioBroker backend
     if (typeof sendTo === 'function') {
         sendTo(null, 'save', newSettings, function (result) {
+            changed = false;
             if (typeof callback === 'function') {
                 callback();
             }
@@ -45,15 +53,15 @@ function save(callback) {
     }
 }
 
-// Bind save button
+// Bind change handlers to all inputs
 $(document).ready(function () {
-    $('#save').click(function () {
-        save();
-    });
+    // Translate labels
+    if (typeof translateAll === 'function') {
+        translateAll();
+    }
 
-    $('#cancel').click(function () {
-        if (typeof load === 'function') {
-            load(window.settings, function () {});
-        }
+    // Track changes on all .value inputs
+    $('.value').on('change input', function () {
+        onChange();
     });
 });
