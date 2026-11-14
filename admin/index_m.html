@@ -7,57 +7,154 @@
     <link rel="stylesheet" href="../../lib/css/materialize.css" />
     <link rel="stylesheet" href="../../css/adapter.css" />
     <style>
-        body { padding: 20px; }
-        .setting { margin-bottom: 20px; }
-        label { color: #000 !important; display: block; margin-bottom: 5px; font-weight: 500; }
-        body.dark label { color: #fff !important; }
-        input { color: #000 !important; background: #fff !important; }
-        input::placeholder { color: rgba(0,0,0,0.4) !important; }
-        body.dark input { color: #fff !important; background: #555 !important; }
-        body.dark input::placeholder { color: rgba(255,255,255,0.4) !important; }
-        h4 { margin-top: 30px; margin-bottom: 15px; color: #000; }
-        body.dark h4 { color: #fff; }
+        body {
+            padding: 20px;
+            background-color: #fff;
+            color: #000;
+        }
+        body.dark {
+            background-color: #303030;
+            color: #fff;
+        }
+        h4 {
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: 500;
+            color: #000;
+            font-size: 1.2em;
+        }
+        body.dark h4 {
+            color: #fff;
+        }
+        .input-field {
+            margin-bottom: 20px;
+        }
+        .input-field > label {
+            color: #000 !important;
+            font-weight: 500;
+        }
+        body.dark .input-field > label {
+            color: #fff !important;
+        }
+        input[type="text"],
+        input[type="password"],
+        input[type="number"] {
+            color: #000 !important;
+            background-color: #fff !important;
+        }
+        body.dark input[type="text"],
+        body.dark input[type="password"],
+        body.dark input[type="number"] {
+            color: #fff !important;
+            background-color: #555 !important;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
     </style>
 </head>
 <body>
-    <h3 data-i18n="buschjaegerwelcome">Busch-Jaeger Welcome</h3>
-    
-    <h4>Gateway Settings</h4>
-    <div class="setting">
-        <label for="gatewayIp" data-i18n="gateway_ip">Gateway IP Address</label>
-        <input class="value" id="gatewayIp" type="text" />
+    <div class="section">
+        <h4>Gateway Settings</h4>
+        <div class="row">
+            <div class="col s12">
+                <div class="input-field">
+                    <input type="text" id="gatewayIp" class="value" />
+                    <label for="gatewayIp" data-i18n="gateway_ip">Gateway IP Address</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s12 m6">
+                <div class="input-field">
+                    <input type="number" id="gatewayPort" class="value" min="1" max="65535" />
+                    <label for="gatewayPort" data-i18n="gateway_port">Gateway Port</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s12 m6">
+                <div class="input-field">
+                    <input type="text" id="username" class="value" />
+                    <label for="username" data-i18n="username">Username</label>
+                </div>
+            </div>
+            <div class="col s12 m6">
+                <div class="input-field">
+                    <input type="password" id="password" class="value" />
+                    <label for="password" data-i18n="password">Password</label>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="setting">
-        <label for="gatewayPort" data-i18n="gateway_port">Gateway Port</label>
-        <input class="value" id="gatewayPort" type="number" min="1" max="65535" />
-    </div>
-    <div class="setting">
-        <label for="username" data-i18n="username">Username</label>
-        <input class="value" id="username" type="text" />
-    </div>
-    <div class="setting">
-        <label for="password" data-i18n="password">Password</label>
-        <input class="value" id="password" type="password" />
-    </div>
-    
-    <h4>Advanced Settings</h4>
-    <div class="setting">
-        <label for="sipPort" data-i18n="sip_port">Local SIP Port</label>
-        <input class="value" id="sipPort" type="number" min="1" max="65535" />
-    </div>
-    <div class="setting">
-        <label for="pollInterval" data-i18n="poll_interval">Poll Interval</label>
-        <input class="value" id="pollInterval" type="number" min="5" max="3600" />
-    </div>
-    <div class="setting">
-        <label for="doorOpenDuration" data-i18n="door_open_duration">Ring Auto-Reset</label>
-        <input class="value" id="doorOpenDuration" type="number" min="1" max="60" />
+
+    <div class="section">
+        <h4>Advanced Settings</h4>
+        <div class="row">
+            <div class="col s12 m4">
+                <div class="input-field">
+                    <input type="number" id="sipPort" class="value" min="1" max="65535" />
+                    <label for="sipPort" data-i18n="sip_port">SIP Port</label>
+                </div>
+            </div>
+            <div class="col s12 m4">
+                <div class="input-field">
+                    <input type="number" id="pollInterval" class="value" min="5" max="3600" />
+                    <label for="pollInterval" data-i18n="poll_interval">Poll Interval</label>
+                </div>
+            </div>
+            <div class="col s12 m4">
+                <div class="input-field">
+                    <input type="number" id="doorOpenDuration" class="value" min="1" max="60" />
+                    <label for="doorOpenDuration" data-i18n="door_open_duration">Ring Duration</label>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="../../lib/js/jquery-3.2.1.min.js"></script>
     <script src="../../lib/js/materialize.js"></script>
     <script src="../../js/translate.js"></script>
     <script src="../../lib/js/socket.io.js"></script>
-    <script src="../../js/adapter-settings.js"></script>
+    <script>
+        let settings = {};
+
+        function load(s, onDone) {
+            settings = s;
+            $('#gatewayIp').val(s.gatewayIp || '');
+            $('#gatewayPort').val(s.gatewayPort || 80);
+            $('#username').val(s.username || '');
+            $('#password').val(s.password || '');
+            $('#sipPort').val(s.sipPort || 5060);
+            $('#pollInterval').val(s.pollInterval || 30);
+            $('#doorOpenDuration').val(s.doorOpenDuration || 5);
+            M.updateTextFields();
+            if (onDone) onDone();
+        }
+
+        function save(callback) {
+            const newSettings = {
+                gatewayIp: $('#gatewayIp').val() || '',
+                gatewayPort: parseInt($('#gatewayPort').val()) || 80,
+                username: $('#username').val() || '',
+                password: $('#password').val() || '',
+                sipPort: parseInt($('#sipPort').val()) || 5060,
+                pollInterval: parseInt($('#pollInterval').val()) || 30,
+                doorOpenDuration: parseInt($('#doorOpenDuration').val()) || 5
+            };
+            if (typeof sendTo === 'function') {
+                sendTo(null, 'save', newSettings, callback);
+            } else if (callback) {
+                callback();
+            }
+        }
+
+        $(document).ready(function () {
+            M.updateTextFields();
+            if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                document.body.classList.add("dark");
+            }
+        });
+    </script>
 </body>
 </html>
