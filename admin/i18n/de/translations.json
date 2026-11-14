@@ -1,0 +1,18 @@
+{
+  "settings": "Einstellungen",
+  "advanced": "Erweitert",
+  "gateway_ip": "Gateway-IP-Adresse",
+  "gateway_ip_help": "IP-Adresse des Busch-Jaeger Welcome IP-Gateways im lokalen Netzwerk",
+  "gateway_port": "Gateway-Port",
+  "gateway_port_help": "Port des Gateways (Standard: 80 für HTTP, 443 für HTTPS)",
+  "username": "Benutzername",
+  "username_help": "Anmeldebenutzername für das Gateway (aus MyBuildings-Portal oder lokaler Admin)",
+  "password": "Passwort",
+  "password_help": "Authentifizierungspasswort (verschlüsselt in der Konfiguration)",
+  "sip_port": "Lokaler SIP-Listener-Port",
+  "sip_port_help": "Lokaler UDP-Port zum Abhören von SIP-INVITE-Paketen (Standard: 5060, Alternative: 5065)",
+  "poll_interval": "Abfrage-Intervall (Sekunden)",
+  "poll_interval_help": "Intervall für Gesundheitsprüfungen und Verbindungsstatus-Updates",
+  "door_open_duration": "Klingelton automatisch zurücksetzen (Sekunden)",
+  "door_open_duration_help": "Zeit in Sekunden, nach der der Zustand 'ring' automatisch auf false zurückgesetzt wird"
+}

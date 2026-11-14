@@ -1,0 +1,35 @@
+{
+  "name": "iobroker.buschjaegerwelcome",
+  "version": "0.1.0",
+  "description": "ioBroker adapter for Busch-Jaeger Welcome IP Gateway control",
+  "author": "Stefan",
+  "license": "MIT",
+  "homepage": "https://github.com/HJS72/iobroker.buschjaegerwelcome",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HJS72/iobroker.buschjaegerwelcome.git"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "main": "build/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint src --ext .ts",
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "pack": "npm run build && npm pack",
+    "prepublishOnly": "npm run lint && npm run build"
+  },
+  "dependencies": {
+    "@iobroker/adapter-core": "^3.0.0",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "typescript": "^5.0.0"
+  }
+}
