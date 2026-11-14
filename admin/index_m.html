@@ -56,59 +56,37 @@
 <body>
     <div class="section">
         <h4>Gateway Settings</h4>
-        <div class="row">
-            <div class="col s12">
-                <div class="input-field">
-                    <input type="text" id="gatewayIp" class="value" />
-                    <label for="gatewayIp" data-i18n="gateway_ip">Gateway IP Address</label>
-                </div>
-            </div>
+        <div class="input-field">
+            <input type="text" id="gatewayIp" class="value" placeholder=" " />
+            <label for="gatewayIp" data-i18n="gateway_ip">Gateway IP Address</label>
         </div>
-        <div class="row">
-            <div class="col s12 m6">
-                <div class="input-field">
-                    <input type="number" id="gatewayPort" class="value" min="1" max="65535" />
-                    <label for="gatewayPort" data-i18n="gateway_port">Gateway Port</label>
-                </div>
-            </div>
+        <div class="input-field">
+            <input type="number" id="gatewayPort" class="value" min="1" max="65535" placeholder=" " />
+            <label for="gatewayPort" data-i18n="gateway_port">Gateway Port</label>
         </div>
-        <div class="row">
-            <div class="col s12 m6">
-                <div class="input-field">
-                    <input type="text" id="username" class="value" />
-                    <label for="username" data-i18n="username">Username</label>
-                </div>
-            </div>
-            <div class="col s12 m6">
-                <div class="input-field">
-                    <input type="password" id="password" class="value" />
-                    <label for="password" data-i18n="password">Password</label>
-                </div>
-            </div>
+        <div class="input-field">
+            <input type="text" id="username" class="value" placeholder=" " />
+            <label for="username" data-i18n="username">Username</label>
+        </div>
+        <div class="input-field">
+            <input type="password" id="password" class="value" placeholder=" " />
+            <label for="password" data-i18n="password">Password</label>
         </div>
     </div>
 
     <div class="section">
         <h4>Advanced Settings</h4>
-        <div class="row">
-            <div class="col s12 m4">
-                <div class="input-field">
-                    <input type="number" id="sipPort" class="value" min="1" max="65535" />
-                    <label for="sipPort" data-i18n="sip_port">SIP Port</label>
-                </div>
-            </div>
-            <div class="col s12 m4">
-                <div class="input-field">
-                    <input type="number" id="pollInterval" class="value" min="5" max="3600" />
-                    <label for="pollInterval" data-i18n="poll_interval">Poll Interval</label>
-                </div>
-            </div>
-            <div class="col s12 m4">
-                <div class="input-field">
-                    <input type="number" id="doorOpenDuration" class="value" min="1" max="60" />
-                    <label for="doorOpenDuration" data-i18n="door_open_duration">Ring Duration</label>
-                </div>
-            </div>
+        <div class="input-field">
+            <input type="number" id="sipPort" class="value" min="1" max="65535" placeholder=" " />
+            <label for="sipPort" data-i18n="sip_port">SIP Port</label>
+        </div>
+        <div class="input-field">
+            <input type="number" id="pollInterval" class="value" min="5" max="3600" placeholder=" " />
+            <label for="pollInterval" data-i18n="poll_interval">Poll Interval</label>
+        </div>
+        <div class="input-field">
+            <input type="number" id="doorOpenDuration" class="value" min="1" max="60" placeholder=" " />
+            <label for="doorOpenDuration" data-i18n="door_open_duration">Ring Duration</label>
         </div>
     </div>
 
@@ -116,22 +94,39 @@
     <script src="../../lib/js/materialize.js"></script>
     <script src="../../js/translate.js"></script>
     <script src="../../lib/js/socket.io.js"></script>
+    <script src="../../js/adapter-settings.js"></script>
     <script>
-        let settings = {};
-
-        function load(s, onDone) {
-            settings = s;
-            $('#gatewayIp').val(s.gatewayIp || '');
-            $('#gatewayPort').val(s.gatewayPort || 80);
-            $('#username').val(s.username || '');
-            $('#password').val(s.password || '');
-            $('#sipPort').val(s.sipPort || 5060);
-            $('#pollInterval').val(s.pollInterval || 30);
-            $('#doorOpenDuration').val(s.doorOpenDuration || 5);
-            M.updateTextFields();
-            if (onDone) onDone();
+        // Global load function - called by ioBroker framework
+        function load(settings, onDone) {
+            $('#gatewayIp').val(settings.gatewayIp || '');
+            $('#gatewayPort').val(settings.gatewayPort || 80);
+            $('#username').val(settings.username || '');
+            $('#password').val(settings.password || '');
+            $('#sipPort').val(settings.sipPort || 5060);
+            $('#pollInterval').val(settings.pollInterval || 30);
+            $('#doorOpenDuration').val(settings.doorOpenDuration || 5);
+            
+            // Materialize update
+            if (typeof M !== 'undefined') {
+                M.updateTextFields();
+            }
+            
+            // Track changes
+            $('.value').on('change input', function () {
+                onChange();
+            });
+            
+            if (onDone && typeof onDone === 'function') {
+                onDone();
+            }
         }
 
+        // Change handler - triggers button display
+        function onChange() {
+            // No-op but required for framework to show save button
+        }
+
+        // Global save function - called by ioBroker framework
         function save(callback) {
             const newSettings = {
                 gatewayIp: $('#gatewayIp').val() || '',
@@ -142,6 +137,7 @@
                 pollInterval: parseInt($('#pollInterval').val()) || 30,
                 doorOpenDuration: parseInt($('#doorOpenDuration').val()) || 5
             };
+            
             if (typeof sendTo === 'function') {
                 sendTo(null, 'save', newSettings, callback);
             } else if (callback) {
@@ -150,9 +146,8 @@
         }
 
         $(document).ready(function () {
-            M.updateTextFields();
-            if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-                document.body.classList.add("dark");
+            if (typeof M !== 'undefined') {
+                M.updateTextFields();
             }
         });
     </script>

@@ -50,5 +50,13 @@
   },
   "encryptedNative": [
     "password"
-  ]
+  ],
+  "admin": {
+    "tab_options": {
+      "order": 1
+    },
+    "tab_instances": {
+      "order": 2
+    }
+  }
 }

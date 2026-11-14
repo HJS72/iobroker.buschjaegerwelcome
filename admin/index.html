@@ -37,9 +37,11 @@
             color: #000 !important;
             background-color: #fff !important;
             box-sizing: border-box;
+            font-size: 1em;
         }
         input:focus {
             border-color: #2196f3;
+            outline: none;
         }
         .section {
             margin-bottom: 30px;
@@ -87,21 +89,34 @@
     <script src="../../lib/js/jquery-ui.min.js"></script>
     <script src="../../js/translate.js"></script>
     <script src="../../lib/js/socket.io.js"></script>
+    <script src="../../js/adapter-settings.js"></script>
     <script>
-        let settings = {};
-
-        function load(s, onDone) {
-            settings = s;
-            $('#gatewayIp').val(s.gatewayIp || '');
-            $('#gatewayPort').val(s.gatewayPort || 80);
-            $('#username').val(s.username || '');
-            $('#password').val(s.password || '');
-            $('#sipPort').val(s.sipPort || 5060);
-            $('#pollInterval').val(s.pollInterval || 30);
-            $('#doorOpenDuration').val(s.doorOpenDuration || 5);
-            if (onDone) onDone();
+        // Global load function - called by ioBroker framework
+        function load(settings, onDone) {
+            $('#gatewayIp').val(settings.gatewayIp || '');
+            $('#gatewayPort').val(settings.gatewayPort || 80);
+            $('#username').val(settings.username || '');
+            $('#password').val(settings.password || '');
+            $('#sipPort').val(settings.sipPort || 5060);
+            $('#pollInterval').val(settings.pollInterval || 30);
+            $('#doorOpenDuration').val(settings.doorOpenDuration || 5);
+            
+            // Track changes
+            $('.value').on('change input', function () {
+                onChange();
+            });
+            
+            if (onDone && typeof onDone === 'function') {
+                onDone();
+            }
         }
 
+        // Change handler - triggers button display
+        function onChange() {
+            // No-op but required for framework to show save button
+        }
+
+        // Global save function - called by ioBroker framework
         function save(callback) {
             const newSettings = {
                 gatewayIp: $('#gatewayIp').val() || '',
@@ -112,18 +127,13 @@
                 pollInterval: parseInt($('#pollInterval').val()) || 30,
                 doorOpenDuration: parseInt($('#doorOpenDuration').val()) || 5
             };
+            
             if (typeof sendTo === 'function') {
                 sendTo(null, 'save', newSettings, callback);
             } else if (callback) {
                 callback();
             }
         }
-
-        $(document).ready(function () {
-            if (typeof translateAll === 'function') {
-                translateAll();
-            }
-        });
     </script>
 </body>
 </html>
